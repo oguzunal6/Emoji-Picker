@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emoji Seç — Sheet Prototipi</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f2f2f7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 16px;
+    color: #1c1c1e;
+  }
+
+  /* ── Sayfa başlığı ── */
+  .page-header {
+    width: 100%;
+    max-width: 390px;
+    margin-bottom: 16px;
+  }
+  .page-header h1 {
+    font-size: 13px;
+    font-weight: 500;
+    color: #8e8e93;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .page-header p {
+    font-size: 12px;
+    color: #aeaeb2;
+  }
+
+  /* ── Sheet kartı ── */
+  .sheet {
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 390px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  /* ── Header ── */
+  .sheet-header {
+    padding: 16px 16px 12px;
+    border-bottom: 0.5px solid rgba(0,0,0,0.1);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 4px;
+  }
+  .sheet-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1c1c1e;
+  }
+  .sheet-sub {
+    font-size: 13px;
+    color: #8e8e93;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .close-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 0.5px solid rgba(0,0,0,0.15);
+    background: #f2f2f7;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #8e8e93;
+    transition: background 0.15s;
+  }
+  .close-btn:hover { background: #e5e5ea; }
+
+  /* ── Arama ── */
+  .search-wrap { position: relative; }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    pointer-events: none;
+    opacity: 0.35;
+  }
+  .ep-search {
+    width: 100%;
+    font-size: 14px;
+    padding: 9px 34px 9px 34px;
+    border-radius: 10px;
+    border: none;
+    background: #f2f2f7;
+    color: #1c1c1e;
+    outline: none;
+    font-family: inherit;
+    transition: box-shadow 0.15s;
+  }
+  .ep-search:focus {
+    box-shadow: 0 0 0 2px #34C759;
+  }
+  .ep-search::placeholder { color: #aeaeb2; }
+  .clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #aeaeb2;
+    border: none;
+    cursor: pointer;
+    font-size: 10px;
+    color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .clear-btn.visible { display: flex; }
+
+  /* ── Body ── */
+  .sheet-body {
+    padding: 0 16px 20px;
+    max-height: 520px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sheet-body::-webkit-scrollbar { width: 4px; }
+  .sheet-body::-webkit-scrollbar-track { background: transparent; }
+  .sheet-body::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 2px; }
+
+  /* ── Kategori ── */
+  .cat-section { margin-top: 20px; }
+  .cat-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1c1c1e;
+    margin-bottom: 12px;
+  }
+
+  /* ── Emoji grid ── */
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+  .e-btn {
+    font-size: 30px;
+    line-height: 1;
+    padding: 8px 4px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.12s, transform 0.12s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .e-btn:hover { background: #f2f2f7; transform: scale(1.15); }
+  .e-btn:active { transform: scale(0.95); }
+  .e-btn.selected { background: #e8f8ed; }
+
+  /* ── Tümünü gör ── */
+  .see-all {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #34C759;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 0;
+    font-family: inherit;
+  }
+  .see-all:hover { opacity: 0.7; }
+
+  /* ── Arama sonucu sayısı ── */
+  .search-count {
+    font-size: 12px;
+    color: #8e8e93;
+    margin-top: 14px;
+    padding-left: 2px;
+    margin-bottom: -6px;
+  }
+
+  /* ── Boş durum ── */
+  .empty-state {
+    padding: 48px 16px;
+    text-align: center;
+    color: #8e8e93;
+    font-size: 14px;
+  }
+  .empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+  /* ── Seçim çubuğu ── */
+  .result-bar {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #fff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #8e8e93;
+    min-height: 48px;
+    width: 100%;
+    max-width: 390px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .result-emoji { font-size: 26px; }
+
+  /* ── Dark mode ── */
+  @media (prefers-color-scheme: dark) {
+    body { background: #1c1c1e; color: #f2f2f7; }
+    .sheet { background: #2c2c2e; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+    .sheet-header { border-bottom-color: rgba(255,255,255,0.1); }
+    .sheet-title { color: #f2f2f7; }
+    .sheet-sub { color: #636366; }
+    .close-btn { background: #3a3a3c; border-color: rgba(255,255,255,0.1); color: #8e8e93; }
+    .close-btn:hover { background: #48484a; }
+    .ep-search { background: #3a3a3c; color: #f2f2f7; }
+    .ep-search::placeholder { color: #636366; }
+    .e-btn:hover { background: #3a3a3c; }
+    .e-btn.selected { background: #1a3a24; }
+    .cat-title { color: #f2f2f7; }
+    .result-bar { background: #2c2c2e; color: #636366; }
+    .page-header h1 { color: #636366; }
+    .page-header p { color: #48484a; }
+    .search-count { color: #636366; }
+    .empty-state { color: #636366; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Prototip — Emoji Seçim Sheet'i</h1>
+  <p>Unicode 9.0 ve altı · iOS &amp; Android uyumlu</p>
+</div>
+
+<div class="sheet">
+  <div class="sheet-header">
+    <div class="header-top">
+      <span class="sheet-title">Emoji Seç</span>
+      <button class="close-btn" onclick="clearAll()">✕</button>
+    </div>
+    <div class="sheet-sub">Listene özel bir emoji seçebilirsin.</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="ep-search" id="ep-search" type="text" placeholder="Emoji ara..." oninput="onSearch(this.value)" autocomplete="off">
+      <button class="clear-btn" id="clear-btn" onclick="clearSearch()">✕</button>
+    </div>
+  </div>
+  <div class="sheet-body" id="sheet-body"></div>
+</div>
+
+<div class="result-bar" id="result-bar">
+  <span style="color:#aeaeb2">Henüz seçilmedi</span>
+</div>
+
+<script>
+const CATS = [
+  {
+    id:"faces", label:"Suratlar & İfadeler",
+    emojis:[
+      {e:"😀",n:"gülen yüz"},{e:"😂",n:"gülerken ağlayan"},{e:"🥲",n:"mutlu ağlayan"},{e:"😇",n:"melek yüzü"},{e:"😉",n:"göz kıpan"},
+      {e:"😍",n:"aşık yüz"},{e:"🥰",n:"sevilgi yüzü"},{e:"😘",n:"öpücük fırlatan"},{e:"😋",n:"lezzetli yüzü"},{e:"😜",n:"göz kıpan dil"},
+      {e:"🤔",n:"düşünen yüz"},{e:"🤓",n:"inek yüzü"},{e:"😎",n:"güneş gözlüklü"},{e:"🤩",n:"yıldız gözlü"},{e:"😏",n:"kurnaz yüz"},
+      {e:"😒",n:"memnuniyetsiz"},{e:"😔",n:"düşünceli"},{e:"😢",n:"ağlayan"},{e:"😭",n:"hıçkıran"},{e:"😤",n:"buhar çıkaran"},
+      {e:"😠",n:"kızgın"},{e:"😡",n:"öfkeli"},{e:"😱",n:"korkudan çığlık"},{e:"😨",n:"korkan"},{e:"😰",n:"kaygılı"},
+      {e:"😴",n:"uyuyan"},{e:"🤒",n:"hasta"},{e:"🤕",n:"yaralı"},{e:"😵",n:"baş dönmesi"},{e:"🤑",n:"para gözlü"},
+      {e:"😬",n:"sırıtan"},{e:"🙄",n:"göz devirme"},{e:"😶",n:"ağızsız"},{e:"😐",n:"nötr"},{e:"😑",n:"ifadesiz"},
+      {e:"🙂",n:"hafif gülen"},{e:"🙃",n:"ters yüz"},{e:"😚",n:"öpücük"},{e:"😳",n:"utanmış"},{e:"😆",n:"kıvrılarak gülen"},
+    ]
+  },
+  {
+    id:"animals", label:"Hayvanlar & Doğa",
+    emojis:[
+      {e:"🦊",n:"tilki"},{e:"🐶",n:"köpek"},{e:"🐻",n:"ayı"},{e:"🐼",n:"panda"},{e:"🐨",n:"koala"},
+      {e:"🐸",n:"kurbağa"},{e:"🐒",n:"maymun"},{e:"🐣",n:"civciv"},{e:"🦅",n:"kartal"},{e:"🦉",n:"baykuş"},
+      {e:"🐞",n:"uğur böceği"},{e:"🦋",n:"kelebek"},{e:"🐝",n:"arı"},{e:"🐙",n:"ahtapot"},{e:"🦈",n:"köpek balığı"},
+      {e:"🐯",n:"kaplan"},{e:"🦁",n:"aslan"},{e:"🐮",n:"inek"},{e:"🐷",n:"domuz"},{e:"🐬",n:"yunus"},
+      {e:"🐳",n:"balina"},{e:"🦜",n:"papağan"},{e:"🦚",n:"tavus kuşu"},{e:"🌸",n:"kiraz çiçeği"},{e:"🌺",n:"çiçek"},
+      {e:"🌻",n:"ayçiçeği"},{e:"🌹",n:"gül"},{e:"🍀",n:"yonca"},{e:"🌿",n:"yaprak"},{e:"🌲",n:"çam ağacı"},
+    ]
+  },
+  {
+    id:"food", label:"Yiyecek & İçecek",
+    emojis:[
+      {e:"🍏",n:"yeşil elma"},{e:"🍎",n:"kırmızı elma"},{e:"🍊",n:"portakal"},{e:"🍉",n:"karpuz"},{e:"🍇",n:"üzüm"},
+      {e:"🍓",n:"çilek"},{e:"🍒",n:"kiraz"},{e:"🍑",n:"şeftali"},{e:"🍋",n:"limon"},{e:"🍌",n:"muz"},
+      {e:"🍕",n:"pizza"},{e:"🍔",n:"hamburger"},{e:"🍟",n:"patates kızartması"},{e:"🌮",n:"taco"},{e:"🍜",n:"erişte"},
+      {e:"🍣",n:"sushi"},{e:"🍩",n:"donut"},{e:"🍰",n:"pasta"},{e:"🎂",n:"doğum günü pastası"},{e:"🍫",n:"çikolata"},
+      {e:"☕",n:"kahve"},{e:"🍵",n:"çay"},{e:"🍺",n:"bira"},{e:"🍷",n:"şarap"},{e:"🍦",n:"dondurma"},
+      {e:"🧁",n:"kek"},{e:"🥐",n:"kruvasan"},{e:"🍳",n:"omlet"},{e:"🥗",n:"salata"},{e:"🍲",n:"çorba"},
+    ]
+  },
+  {
+    id:"travel", label:"Seyahat & Yerler",
+    emojis:[
+      {e:"🚗",n:"araba"},{e:"🚕",n:"taksi"},{e:"🚌",n:"otobüs"},{e:"🚑",n:"ambulans"},{e:"🚒",n:"itfaiye"},
+      {e:"✈️",n:"uçak"},{e:"🚀",n:"roket"},{e:"🚢",n:"gemi"},{e:"🏠",n:"ev"},{e:"🏢",n:"ofis binası"},
+      {e:"🌍",n:"dünya"},{e:"🗺",n:"harita"},{e:"🗼",n:"eyfel kulesi"},{e:"🌋",n:"yanardağ"},{e:"🏔",n:"dağ"},
+      {e:"🏖",n:"plaj"},{e:"🏜",n:"çöl"},{e:"🌅",n:"gün doğumu"},{e:"🌃",n:"gece şehri"},{e:"⛺",n:"çadır"},
+      {e:"🎡",n:"dönme dolap"},{e:"🚦",n:"trafik lambası"},{e:"⛽",n:"benzin"},{e:"⚓",n:"çapa"},{e:"🏕",n:"kamp"},
+    ]
+  },
+  {
+    id:"objects", label:"Nesneler",
+    emojis:[
+      {e:"💡",n:"ampul"},{e:"🔑",n:"anahtar"},{e:"🔒",n:"kilit"},{e:"📱",n:"telefon"},{e:"💻",n:"laptop"},
+      {e:"🎁",n:"hediye"},{e:"📌",n:"raptiye"},{e:"✂️",n:"makas"},{e:"📝",n:"not"},{e:"📋",n:"pano"},
+      {e:"🔔",n:"zil"},{e:"🎵",n:"nota"},{e:"🎮",n:"oyun kumandası"},{e:"🏆",n:"kupa"},{e:"🎯",n:"hedef"},
+      {e:"🎲",n:"zar"},{e:"📷",n:"fotoğraf makinesi"},{e:"🔍",n:"büyüteç"},{e:"💊",n:"hap"},{e:"💎",n:"elmas"},
+      {e:"👑",n:"taç"},{e:"🎀",n:"kurdele"},{e:"🛍",n:"alışveriş çantası"},{e:"🧲",n:"mıknatıs"},{e:"🔭",n:"teleskop"},
+      {e:"🔬",n:"mikroskop"},{e:"🧪",n:"test tüpü"},{e:"📢",n:"hoparlör"},{e:"🎸",n:"gitar"},{e:"🥇",n:"altın madalya"},
+    ]
+  },
+  {
+    id:"symbols", label:"Semboller",
+    emojis:[
+      {e:"⭐",n:"yıldız"},{e:"🌟",n:"parlayan yıldız"},{e:"✨",n:"parıltı"},{e:"⚡",n:"yıldırım"},{e:"🔥",n:"ateş"},
+      {e:"✅",n:"onay"},{e:"❌",n:"iptal"},{e:"⚠️",n:"uyarı"},{e:"🚫",n:"yasak"},{e:"💯",n:"yüz puan"},
+      {e:"🔴",n:"kırmızı daire"},{e:"🟡",n:"sarı daire"},{e:"🟢",n:"yeşil daire"},{e:"🔵",n:"mavi daire"},{e:"⚫",n:"siyah daire"},
+      {e:"🔶",n:"turuncu elmas"},{e:"🔷",n:"mavi elmas"},{e:"🔸",n:"küçük turuncu"},{e:"🔹",n:"küçük mavi"},{e:"🔺",n:"kırmızı üçgen"},
+      {e:"➡️",n:"sağ ok"},{e:"⬅️",n:"sol ok"},{e:"⬆️",n:"yukarı ok"},{e:"⬇️",n:"aşağı ok"},{e:"❓",n:"soru işareti"},
+      {e:"❗",n:"ünlem"},{e:"💬",n:"konuşma balonu"},{e:"💭",n:"düşünce balonu"},{e:"🎯",n:"hedef"},{e:"🏁",n:"yarış bayrağı"},
+    ]
+  }
+];
+
+const PREVIEW = 15;
+const expanded = {};
+let selected = null;
+let searchTerm = "";
+
+function onSearch(val) {
+  searchTerm = val.trim().toLowerCase();
+  document.getElementById("clear-btn").classList.toggle("visible", val.length > 0);
+  render();
+}
+
+function clearSearch() {
+  const inp = document.getElementById("ep-search");
+  inp.value = "";
+  searchTerm = "";
+  document.getElementById("clear-btn").classList.remove("visible");
+  inp.focus();
+  render();
+}
+
+function clearAll() {
+  clearSearch();
+  selected = null;
+  Object.keys(expanded).forEach(k => delete expanded[k]);
+  render();
+  document.getElementById("result-bar").innerHTML = `<span style="color:#aeaeb2">Henüz seçilmedi</span>`;
+}
+
+function toggle(id) {
+  expanded[id] = !expanded[id];
+  render();
+}
+
+function pick(e, n) {
+  selected = { e, n };
+  render();
+  document.getElementById("result-bar").innerHTML =
+    `<span class="result-emoji">${e}</span>` +
+    `<span style="color:#1c1c1e;font-size:14px;font-weight:500;">${n.charAt(0).toUpperCase() + n.slice(1)}</span>` +
+    `<span style="color:#8e8e93;font-size:12px;margin-left:auto;">seçildi ✓</span>`;
+}
+
+function render() {
+  const body = document.getElementById("sheet-body");
+
+  if (searchTerm) {
+    const ALL = CATS.flatMap(c => c.emojis.map(em => ({ ...em, cat: c.label })));
+    const results = ALL.filter(em => em.n.includes(searchTerm) || em.e === searchTerm);
+    if (!results.length) {
+      body.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div>"${searchTerm}" için sonuç bulunamadı</div></div>`;
+      return;
+    }
+    const grid = results.map(em =>
+      `<button class="e-btn${selected && selected.e === em.e ? " selected" : ""}" title="${em.n}" onclick="pick('${em.e}','${em.n}')">${em.e}</button>`
+    ).join("");
+    body.innerHTML = `<div class="search-count">${results.length} emoji bulundu</div><div class="cat-section"><div class="emoji-grid">${grid}</div></div>`;
+    return;
+  }
+
+  body.innerHTML = CATS.map(cat => {
+    const isExp = expanded[cat.id];
+    const shown = isExp ? cat.emojis : cat.emojis.slice(0, PREVIEW);
+    const grid = shown.map(em =>
+      `<button class="e-btn${selected && selected.e === em.e ? " selected" : ""}" title="${em.n}" onclick="pick('${em.e}','${em.n}')">${em.e}</button>`
+    ).join("");
+    const btn = cat.emojis.length > PREVIEW
+      ? `<button class="see-all" onclick="toggle('${cat.id}')">${isExp ? "Daha az gör" : "Tümünü gör"}</button>` : "";
+    return `<div class="cat-section"><div class="cat-title">${cat.label}</div><div class="emoji-grid">${grid}</div>${btn}</div>`;
+  }).join("");
+}
+
+render();
+</script>
+</body>
+</html>
